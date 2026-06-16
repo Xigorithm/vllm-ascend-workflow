@@ -114,7 +114,7 @@ Agent Skills define specialized workflows that turn an AI coding assistant into 
 
 | Skill | Description | Trigger Example |
 |:------|:------------|:----------------|
-| **feature-learning** | Generate comprehensive Chinese technical learning documents with Mermaid architecture diagrams, GPU-vs-NPU comparisons, and source code walkthroughs | `我想了解 vllm-ascend 的 ACL Graph` |
+| **feature-learning** | Generate comprehensive Chinese technical learning documents with Mermaid architecture diagrams, GPU-vs-NPU comparisons, and source code walkthroughs | `我想了解 vllm-ascend 的量化特性` |
 | **model-tutorial** | Generate Chinese technical tutorial documents for specific models running on Ascend NPU | `帮我生成 DeepSeek-V3 在昇腾上的模型教程` |
 
 ### 🧑‍💻 Feature Development
