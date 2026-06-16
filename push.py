@@ -31,17 +31,38 @@ remote_sha = remote_ref["object"]["sha"]
 if local_sha == remote_sha:
     print("Already up to date."); sys.exit(0)
 
-commits = run(f"git rev-list {remote_sha}..HEAD").split("\n")
-commits = [c for c in commits if c]
-print(f"Pushing {len(commits)} commit(s)...")
+remote_commits = api("/commits?sha=main&per_page=100")
+remote_shas = {c["sha"] for c in remote_commits}
+remote_msg_map = {c["commit"]["message"]: c["sha"] for c in remote_commits}
 
-for commit_sha in reversed(commits):
+all_commits = run("git rev-list HEAD").split("\n")
+all_commits = [c for c in all_commits if c]
+
+to_push = []
+sha_map = {}
+for c in all_commits:
+    if c in remote_shas:
+        sha_map[c] = c
+        break
+    msg = run(f"git log -1 --format=%B {c}")
+    if msg in remote_msg_map:
+        sha_map[c] = remote_msg_map[msg]
+        break
+    to_push.append(c)
+
+if not to_push:
+    print("Already up to date."); sys.exit(0)
+
+print(f"Pushing {len(to_push)} commit(s)...")
+
+for commit_sha in reversed(to_push):
     msg = run(f"git log -1 --format=%B {commit_sha}")
-    parent = run(f"git rev-parse {commit_sha}^")
+    local_parent = run(f"git rev-parse {commit_sha}^")
+    remote_parent = sha_map.get(local_parent, local_parent)
     files = run(f"git diff-tree --no-commit-id -r --name-only {commit_sha}").split("\n")
     files = [f for f in files if f]
 
-    parent_data = api(f"/git/commits/{parent}")
+    parent_data = api(f"/git/commits/{remote_parent}")
     base_tree = parent_data["tree"]["sha"]
 
     tree_entries = []
@@ -54,14 +75,15 @@ for commit_sha in reversed(commits):
             pass
 
     new_tree = api("/git/trees", {"base_tree": base_tree, "tree": tree_entries})
-    new_commit = api("/git/commits", {"message": msg, "tree": new_tree["sha"], "parents": [parent]})
+    new_commit = api("/git/commits", {"message": msg, "tree": new_tree["sha"], "parents": [remote_parent]})
     remote_sha = new_commit["sha"]
+    sha_map[commit_sha] = remote_sha
     print(f"  {commit_sha[:7]} -> {remote_sha[:7]}: {msg.split(chr(10))[0]}")
 
-api("/git/refs/heads/main", {"sha": remote_sha}, method="PATCH")
+api("/git/refs/heads/main", {"sha": remote_sha, "force": True}, method="PATCH")
 try:
-    run("git fetch origin main")
+    subprocess.run(["git", "fetch", "origin", "main"], timeout=15, check=True, capture_output=True, text=True)
     run("git reset --hard origin/main")
-except subprocess.CalledProcessError:
+except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
     print("Warning: git fetch failed. Push succeeded via API, local branch may be out of sync.")
 print("Done!")
