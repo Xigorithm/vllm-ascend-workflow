@@ -20,34 +20,65 @@
 
 [vllm-ascend-workflow](https://github.com/Xigorithm/vllm-ascend-workflow) is an **AI-assisted development workflow repository** for [vllm-ascend](https://github.com/vllm-project/vllm-ascend) (vLLM Ascend NPU plugin), powered by [OpenCode](https://opencode.ai) Agent Skills.
 
-This repository transforms AI coding assistants into vllm-ascend domain experts through reusable Agent Skills, technical documents, and development session records — systematically accelerating the entire vllm-ascend development lifecycle.
+This repository covers the full vllm-ascend development pipeline — **Learning → RFC → Develop → Test → PR Review → BenchMark** — mapping each stage to specialized Agent Skills and repository directories:
 
 ```mermaid
-graph LR
-    subgraph "🧠 AI Agent Skills"
-        A[Feature Design] --> B[Code Implementation]
-        A --> C[Design Documents]
-        D[PR Analysis] --> E[Code Review]
-        D --> F[Description Generation]
-        G[Test Generation] --> H[Unit Tests]
-        G --> I[Integration Tests]
+graph TB
+    subgraph "🔄 Development Pipeline"
+        direction LR
+        P1["🔍 Learning"] --> P2["📝 RFC"]
+        P2 --> P3["🧑‍💻 Develop"]
+        P3 --> P4["🧪 Test"]
+        P4 --> P5["🔎 PR Review"]
+        P5 --> P6["📊 BenchMark"]
     end
 
-    subgraph "📚 Knowledge Base"
-        J[Docs - Technical Documents]
-        K[Sessions - Dev Records]
+    subgraph "🧠 Agent Skills"
+        direction LR
+        S1["feature-learning<br>model-tutorial"] ~~~ S2["rfc-creator"]
+        S2 ~~~ S3["feature-design<br>pr-description-creator"]
+        S3 ~~~ S4["test-creator"]
+        S4 ~~~ S5["pr-summary-creator"]
+        S5 ~~~ S6["benchmark-result-summary"]
     end
 
-    B --> J
-    C --> J
-    E --> K
-    H --> K
+    subgraph "📁 Repository"
+        direction LR
+        D1["skill/ — Skill definitions"]
+        D2["docs/ — Technical documents & RFCs"]
+        D3["sessions/ — Development session records"]
+    end
 
-    style A fill:#e1f5fe
-    style D fill:#fff3e0
-    style G fill:#e8f5e9
-    style J fill:#f3e5f5
-    style K fill:#f3e5f5
+    P1 --> S1
+    P2 --> S2
+    P3 --> S3
+    P4 --> S4
+    P5 --> S5
+    P6 --> S6
+
+    S1 --> D1
+    S2 --> D1
+    S3 --> D1
+    S4 --> D1
+    S5 --> D1
+    S6 --> D1
+
+    S1 --> D2
+    S2 --> D2
+    S3 --> D2
+
+    S3 --> D3
+    S5 --> D3
+
+    style P1 fill:#e1f5fe
+    style P2 fill:#e1f5fe
+    style P3 fill:#e8f5e9
+    style P4 fill:#fff3e0
+    style P5 fill:#fff3e0
+    style P6 fill:#fce4ec
+    style D1 fill:#f3e5f5
+    style D2 fill:#f3e5f5
+    style D3 fill:#f3e5f5
 ```
 
 ---
@@ -81,36 +112,36 @@ Agent Skills define specialized workflows that turn an AI coding assistant into 
 
 ### 🔍 Code Learning
 
-| Skill | Description | Trigger Example | Rating |
-|:------|:------------|:----------------|:-------|
-| **feature-learning** | Generate comprehensive Chinese technical learning documents with Mermaid architecture diagrams, GPU-vs-NPU comparisons, and source code walkthroughs | `我想了解 vllm-ascend 的 ACL Graph` | ⭐⭐⭐⭐⭐ |
-| **model-tutorial** | Generate Chinese technical tutorial documents for specific models running on Ascend NPU | `帮我生成 DeepSeek-V3 在昇腾上的模型教程` | ⭐⭐⭐⭐⭐ |
+| Skill | Description | Trigger Example |
+|:------|:------------|:----------------|
+| **feature-learning** | Generate comprehensive Chinese technical learning documents with Mermaid architecture diagrams, GPU-vs-NPU comparisons, and source code walkthroughs | `我想了解 vllm-ascend 的 ACL Graph` |
+| **model-tutorial** | Generate Chinese technical tutorial documents for specific models running on Ascend NPU | `帮我生成 DeepSeek-V3 在昇腾上的模型教程` |
 
 ### 🧑‍💻 Feature Development
 
-| Skill | Description | Trigger Example | Rating |
-|:------|:------------|:----------------|:-------|
-| **feature-design** | Design and implement vllm-ascend features with code implementation and Chinese technical design documents | `帮我在 vllm-ascend 中实现 W4A16 量化` | ⭐⭐⭐⭐ |
-| **rfc-creator** | Generate vllm-ascend style RFC documents for major architectural change proposals | `帮我生成一个 vllm-ascend RFC` | ⭐⭐⭐ |
-| **pr-description-creator** | Generate vllm-ascend style PR descriptions (Purpose / Test Plan / Test Result) from GitHub PR code changes | `帮我生成 vllm-ascend PR 1234 的描述` | ⭐⭐⭐ |
+| Skill | Description | Trigger Example |
+|:------|:------------|:----------------|
+| **feature-design** | Design and implement vllm-ascend features with code implementation and Chinese technical design documents | `帮我在 vllm-ascend 中实现 W4A16 量化` |
+| **rfc-creator** | Generate vllm-ascend style RFC documents for major architectural change proposals | `帮我生成一个 vllm-ascend RFC` |
+| **pr-description-creator** | Generate vllm-ascend style PR descriptions (Purpose / Test Plan / Test Result) from GitHub PR code changes | `帮我生成 vllm-ascend PR 1234 的描述` |
 
 ### 🧪 Testing
 
-| Skill | Description | Trigger Example | Rating |
-|:------|:------------|:----------------|:-------|
-| **test-creator** | Generate unit tests and integration tests for the vllm-ascend repository | `帮我写 vllm-ascend 中 XXX 的测试用例` | ⭐⭐⭐⭐ |
+| Skill | Description | Trigger Example |
+|:------|:------------|:----------------|
+| **test-creator** | Generate unit tests and integration tests for the vllm-ascend repository | `帮我写 vllm-ascend 中 XXX 的测试用例` |
 
 ### 🔎 Code Review
 
-| Skill | Description | Trigger Example | Rating |
-|:------|:------------|:----------------|:-------|
-| **pr-summary-creator** | Fetch and deeply analyze vllm-ascend PRs, generating comprehensive reports with code change analysis, Mermaid architecture diagrams, and risk assessment | `帮我分析 vllm-ascend PR 1234` | ⭐⭐⭐⭐ |
+| Skill | Description | Trigger Example |
+|:------|:------------|:----------------|
+| **pr-summary-creator** | Fetch and deeply analyze vllm-ascend PRs, generating comprehensive reports with code change analysis, Mermaid architecture diagrams, and risk assessment | `帮我分析 vllm-ascend PR 1234` |
 
 ### 📊 Performance Analysis
 
-| Skill | Description | Trigger Example | Rating |
-|:------|:------------|:----------------|:-------|
-| **benchmark-result-summary** | Compare vllm-ascend serving benchmark outputs before and after a code change with percentage change analysis | *(Paste benchmark output and ask to compare)* | ⭐⭐ |
+| Skill | Description | Trigger Example |
+|:------|:------------|:----------------|
+| **benchmark-result-summary** | Compare vllm-ascend serving benchmark outputs before and after a code change with percentage change analysis | *(Paste benchmark output and ask to compare)* |
 
 ---
 
@@ -252,8 +283,3 @@ Contributions are welcome! Here are ways to get involved:
 
 Same as [vllm-ascend](https://github.com/vllm-project/vllm-ascend) (Apache-2.0).
 
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Xigorithm/vllm-ascend-workflow&type=Timeline)](https://www.star-history.com/#Xigorithm/vllm-ascend-workflow&Timeline)
